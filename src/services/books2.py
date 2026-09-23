@@ -20,6 +20,10 @@ class Book:
                 setattr(self, field, value)
 
     @staticmethod
+    def get_book_by_rating(rating: int):
+        return [b for b in BOOKS.values() if b.rating == rating]
+
+    @staticmethod
     def get_book_by_id(book_id: int):
         return BOOKS.get(book_id)
 

@@ -4,7 +4,9 @@ from src.schema.book_schema import *
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
-@router.get("/")
+#-----GET-----
+
+@router.get("")
 async def read_all_books():
     return Book.get_all()
 
@@ -15,9 +17,21 @@ async def fetch_book_by_id(book_id: int):
         raise HTTPException(status_code=404, detail="Book not found.")
     return vars(book)
 
+@router.get("/")
+async def fetch_book_by_rating(rating: int):
+    books_to_return=Book.get_book_by_rating(rating)
+    if len(books_to_return)<=0:
+        return f"No books found with rating: {rating}"
+    return [vars(b) for b in books_to_return]
+    
+#-----POST-----
+
 @router.post("/add")
 async def add_book(book: add_Book):
     Book(**book.model_dump()).add_book()
+
+
+#-----PUT-----
 
 @router.put("/update/{book_id}")
 async def update_book(book_id: int, data:update_Book):
@@ -29,3 +43,6 @@ async def update_book(book_id: int, data:update_Book):
         "message": "Book Details changed successfully.",
         "book": vars(book)
     }
+
+
+#-----DELETE-----
