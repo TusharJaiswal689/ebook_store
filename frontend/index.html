@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Add Book</h2>
+  <form id="fa">
+    Title: <input name="title" placeholder="ex: MyBook" /><br><br>
+    Author: <input name="author" placeholder="ex: Tushar" /><br><br>
+    Category: <input name="category" placeholder="ex: History" /><br><br>
+    <button type="submit">Submit</button>
+  </form>
+  <br>
+  <h2> Update Book</h2>
+  <form id="fu">
+    Search: <input name="book_title" placeholder="enter the book title to update."/><br><br>
+    Title: <input name="title" placeholder="enter new title"/><br><br>
+    Author: <input name="author" placeholder="ex: Tushar" /><br><br>
+    Category: <input name="category" placeholder="ex: History" /><br><br>
+    <button type="submit">Update</button>
+  </form>
+  <br>
+  <h2>Get Books</h2>
+  <button type="button" id="get_books">Show Books</button>
+  <br>
+  <pre id="out"></pre>
+
+
+  <script>
+    document.getElementById("fa").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+
+      const res = await fetch("http://localhost:8000/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      document.getElementById("out").textContent = JSON.stringify(await res.json(), null, 2);
+      e.target.reset();
+    });
+
+    document.getElementById("fu").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const book_title = data.book_title;
+    delete data.book_title;
+
+    const res = await fetch(`http://localhost:8000/books/update?book_title=${encodeURIComponent(book_title)}`,{
+      method: "PUT",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+
+    document.getElementById("out").textContent = JSON.stringify(await res.json(), null, 2);
+    e.target.reset();
+  });
+
+  document.getElementById("get_books").addEventListener("click", async ()=> {
+    const res = await fetch("http://localhost:8000/books");
+    document.getElementById("out").textContent = JSON.stringify(await res.json(), null, 2);
+    });
+  </script>
+</body>
+</html>   
