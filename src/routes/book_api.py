@@ -1,29 +1,30 @@
 from fastapi import APIRouter, HTTPException, Path, Query, Request
 from src.services.books2 import Book, BookRepository
 from src.schema.book_schema import *
+from starlette import status
 
 router = APIRouter(prefix="/books", tags=["Books"])
 
 #-----GET-----
 
-@router.get("")
+@router.get("", status_code=status.HTTP_200_OK)
 async def read_all_books():
     return BookRepository.get_all()
 
-@router.get("/{book_id}")
+@router.get("/{book_id}", status_code=status.HTTP_200_OK)
 async def fetch_book_by_id(book_id: int= Path(gt=0)):
     book = BookRepository.get_book_by_id(book_id)
     if book == None:
         raise HTTPException(status_code=404, detail="Book not found.")
     return vars(book)
 
-@router.get("/")
+@router.get("/", status_code=status.HTTP_200_OK)
 async def filter_books_by_kwargs(request: Request):
     filters= dict(request.query_params)
     books = BookRepository.filter_book(filters)
     return [vars(book) for book in books]
 
-@router.get("/search/")
+@router.get("/search/", status_code=status.HTTP_200_OK)
 async def search_book_by_likeness(query: str):
     books = BookRepository.search(query)
     return [vars(book) for book in books]
@@ -31,14 +32,14 @@ async def search_book_by_likeness(query: str):
     
 #-----POST-----
 
-@router.post("/add")
+@router.post("/add", status_code=status.HTTP_201_CREATED)
 async def add_book(book: add_Book):
     Book(**book.model_dump()).add_book()
 
 
 #-----PUT-----
 
-@router.put("/update/{book_id}")
+@router.put("/update/{book_id}", status_code=status.HTTP_200_OK)
 async def update_book(data: update_Book, book_id: int= Path(gt=0), ):
     book = BookRepository.get_book_by_id(book_id)
     if book == None:
@@ -51,7 +52,7 @@ async def update_book(data: update_Book, book_id: int= Path(gt=0), ):
 
 
 #-----DELETE-----
-@router.delete("/delete/{book_id}")
+@router.delete("/delete/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int= Path(gt=0)):
     BookRepository.delete_book_by_id(book_id)
     return {
