@@ -5,16 +5,18 @@
   <form id="fa">
     Title: <input name="title" placeholder="ex: MyBook" /><br><br>
     Author: <input name="author" placeholder="ex: Tushar" /><br><br>
-    Category: <input name="category" placeholder="ex: History" /><br><br>
+    Description: <input name="description" placeholder="ex: abc" /><br><br>
+    Rating: <input name="rating" placeholder="ex:1-5"/><br><br>
     <button type="submit">Submit</button>
   </form>
   <br>
   <h2> Update Book</h2>
   <form id="fu">
-    Search: <input name="book_title" placeholder="enter the book title to update."/><br><br>
+    Book Id: <input name="book_id" placeholder="enter the book id to update."/><br><br>
     Title: <input name="title" placeholder="enter new title"/><br><br>
     Author: <input name="author" placeholder="ex: Tushar" /><br><br>
-    Category: <input name="category" placeholder="ex: History" /><br><br>
+    Description: <input name="description" placeholder="ex: abc" /><br><br>
+    Rating: <input name="rating" placeholder="ex:1-5"/><br><br>
     <button type="submit">Update</button>
   </form>
   <br>
@@ -29,7 +31,7 @@
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target));
 
-      const res = await fetch("http://localhost:8000/books", {
+      const res = await fetch("http://localhost:8000/books/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
@@ -42,10 +44,14 @@
     document.getElementById("fu").addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
-    const book_title = data.book_title;
-    delete data.book_title;
+    const book_id = data.book_id;
+    delete data.book_id;
 
-    const res = await fetch(`http://localhost:8000/books/update?book_title=${encodeURIComponent(book_title)}`,{
+    for (const key of Object.keys(data)) {
+      if (data[key] === "") delete data[key];
+  }
+
+    const res = await fetch(`http://localhost:8000/books/update/${book_id}`,{
       method: "PUT",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(data)
